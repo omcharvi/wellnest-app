@@ -2,6 +2,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date
+from backend.models.mood import MoodLog
 
 class MoodLog(BaseModel):
     date: str           # YYYY-MM-DD
