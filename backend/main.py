@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routes import auth, mood, journal, analytics, chat, reports
+from backend.routes import auth, mood, journal, analytics, chat, reports
 
 load_dotenv()
 
