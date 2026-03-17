@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from models.mood import MoodLog
-from services.ai_service import suggest_coping_strategy, generate_journal_prompt
+from backend.services.auth_service import hash_password, verify_password, create_access_token, decode_token
 from routes.auth import get_current_user, get_db
 from datetime import datetime
 from bson import ObjectId

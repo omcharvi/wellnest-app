@@ -8,6 +8,7 @@ from routes.auth import get_current_user, get_db
 from io import BytesIO
 from datetime import datetime
 from backend.models.user import UserRegister, UserLogin
+from backend.services.auth_service import hash_password, verify_password, create_access_token, decode_token
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 
