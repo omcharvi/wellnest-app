@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from motor.motor_asyncio import AsyncIOMotorClient
-from models.user import UserRegister, UserLogin
+from backend.models.user import UserRegister, UserLogin
 from services.auth_service import hash_password, verify_password, create_access_token, decode_token
 from datetime import datetime
 import os

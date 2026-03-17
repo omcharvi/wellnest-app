@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List
 from services.ai_service import chat_with_companion
 from routes.auth import get_current_user
+from backend.models.user import UserRegister, UserLogin
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
-from models.journal import JournalEntry
+from backend.models.user import UserRegister, UserLogin
 from services.ai_service import summarize_journal
 from routes.auth import get_current_user, get_db
 from datetime import datetime

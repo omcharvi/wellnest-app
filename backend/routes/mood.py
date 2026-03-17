@@ -6,6 +6,7 @@ from routes.auth import get_current_user, get_db
 from datetime import datetime
 from bson import ObjectId
 import os
+from backend.models.user import UserRegister, UserLogin
 
 router = APIRouter(prefix="/mood", tags=["mood"])
 

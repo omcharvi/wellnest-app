@@ -7,6 +7,7 @@ from reportlab.lib import colors
 from routes.auth import get_current_user, get_db
 from io import BytesIO
 from datetime import datetime
+from backend.models.user import UserRegister, UserLogin
 
 router = APIRouter(prefix="/reports", tags=["reports"])
 

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from routes.auth import get_current_user, get_db
 from collections import defaultdict
+from backend.models.user import UserRegister, UserLogin
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
