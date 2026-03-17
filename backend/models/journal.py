@@ -4,7 +4,7 @@ from typing import Optional, List
 class JournalEntry(BaseModel):
     date: str
     content: str
-    tags: Optional[List[str]] = []
+    tags: Optional[List[str]] = None
 
 class JournalResponse(BaseModel):
     id: str
