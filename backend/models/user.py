@@ -15,4 +15,4 @@ class UserProfile(BaseModel):
     id: str
     email: str
     name: str
-    created_at: datetimeS
+    created_at: datetime
