@@ -3,5 +3,7 @@ uvicorn[standard]
 pydantic
 joblib
 scikit-learn
-email-validator==2.1.0
+email-validator
+
 motor==3.3.2
+pymongo==4.6.1
