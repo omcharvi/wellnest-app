@@ -7,9 +7,13 @@ load_dotenv()
 
 app = FastAPI(title="WellNest API", version="1.0.0")
 
+# ✅ CORS - only add ONCE
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restrict in production
+    allow_origins=[
+        "https://wellnest-app-qbab.vercel.app",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,15 +29,3 @@ app.include_router(reports.router)
 @app.get("/")
 def root():
     return {"status": "WellNest API running ✅"}
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://wellnest-app-qbab.vercel.app",  # ← your exact URL
-        "http://localhost:3000",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
