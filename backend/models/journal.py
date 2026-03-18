@@ -1,14 +1,13 @@
 from pydantic import BaseModel
 from typing import Optional, List
 
-# 🔹 Request model (when user adds journal)
+# 🔹 Request model
 class JournalEntry(BaseModel):
     date: str
     content: str
     tags: Optional[List[str]] = None
 
-
-# 🔹 Response model (when sending data back)
+# 🔹 Response model
 class JournalResponse(BaseModel):
     id: str
     user_id: str
