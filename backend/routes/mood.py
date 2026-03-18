@@ -6,7 +6,7 @@ from datetime import datetime
 from bson import ObjectId
 import os
 from backend.models.user import UserRegister, UserLogin
-
+from backend.models.mood import MoodLog
 router = APIRouter(prefix="/mood", tags=["mood"])
 
 @router.post("/log")
