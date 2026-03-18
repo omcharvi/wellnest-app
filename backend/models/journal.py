@@ -1,3 +1,4 @@
+from backend.models.journal import JournalEntry
 from pydantic import BaseModel
 from typing import Optional, List
 
