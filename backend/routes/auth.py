@@ -5,13 +5,14 @@ from backend.models.user import UserRegister, UserLogin
 from backend.services.auth_service import hash_password, verify_password, create_access_token, decode_token
 from datetime import datetime
 import os
-from backend.routes.auth import get_current_user, get_db
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 security = HTTPBearer()
 
+client = AsyncIOMotorClient(os.getenv("MONGODB_URL"))
+
 def get_db():
-    client = AsyncIOMotorClient(os.getenv("MONGODB_URL"))
     return client.wellnest
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
