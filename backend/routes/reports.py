@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
-from routes.auth import get_current_user, get_db
+from backend.routes.auth import get_current_user, get_db
 from io import BytesIO
 from datetime import datetime
 from backend.models.user import UserRegister, UserLogin
