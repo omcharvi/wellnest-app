@@ -1,26 +1,48 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 import os
 
-SECRET_KEY = os.getenv("JWT_SECRET", "fallback-secret")
+# 🔐 Secret key (use env in production)
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 24
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def verify_password(password: str, hashed: str) -> bool:
-    password = password[:72]  # 🔥 FIX
-    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+# ✅ Hash password
+def hash_password(password: str) -> str:
+    # Fix: bcrypt max 72 bytes
+    password = password[:72]
 
-def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
-def create_access_token(user_id: str) -> str:
-    expire = datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
-    return jwt.encode({"sub": user_id, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
 
-def decode_token(token: str) -> str:
+# ✅ Verify password
+def verify_password(password: str, hashed_password: str) -> bool:
+    password = password[:72]
+
+    return bcrypt.checkpw(
+        password.encode("utf-8"),
+        hashed_password.encode("utf-8")
+    )
+
+
+# ✅ Create JWT token
+def create_access_token(data: str):
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    payload = {
+        "sub": data,
+        "exp": expire
+    }
+
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return token
+
+
+# ✅ Decode JWT token
+def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload.get("sub")
