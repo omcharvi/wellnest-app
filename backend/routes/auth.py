@@ -11,28 +11,27 @@ from backend.services.auth_service import (
 from datetime import datetime
 import os
 
-# 🔹 Router setup
+# Router setup
 router = APIRouter(prefix="/auth", tags=["auth"])
 security = HTTPBearer()
 
-# 🔴 Load Mongo URI
+# Load Mongo URI
 MONGO_URI = os.getenv("MONGO_URI")
 
-# 🔴 Check if env variable exists
 if not MONGO_URI:
-    raise Exception("❌ MONGO_URI is NOT set in environment variables")
+    raise Exception("❌ MONGO_URI not set")
 
-print("✅ MONGO_URI loaded:", MONGO_URI)
+print("✅ MongoDB Connected")
 
-# 🔹 MongoDB client (with TLS for Atlas)
-client = AsyncIOMotorClient(MONGO_URI, tls=True)
+# MongoDB client (IMPORTANT FIX: remove tls=True)
+client = AsyncIOMotorClient(MONGO_URI)
 
-# 🔹 Get database
+# Get DB
 def get_db():
     return client["wellnest"]
 
 
-# 🔹 Get current user from token
+# Get current user
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security)
 ):
@@ -45,18 +44,18 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-# 🔹 Register API
+# REGISTER API
 @router.post("/register")
 async def register(user: UserRegister):
-    try:
-        db = get_db()
+    db = get_db()
 
-        # Check if user already exists
+    try:
+        # Check existing user
         existing = await db.users.find_one({"email": user.email})
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
 
-        # Create user document
+        # Insert user
         user_doc = {
             "email": user.email,
             "name": user.name,
@@ -64,10 +63,9 @@ async def register(user: UserRegister):
             "created_at": datetime.utcnow()
         }
 
-        # Insert into DB
         result = await db.users.insert_one(user_doc)
 
-        # Create token
+        # Token
         token = create_access_token(str(result.inserted_id))
 
         return {
@@ -76,24 +74,27 @@ async def register(user: UserRegister):
             "email": user.email
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        print("❌ Register Error:", str(e))
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        print("❌ REGISTER ERROR:", e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# 🔹 Login API
+# LOGIN API
 @router.post("/login")
 async def login(user: UserLogin):
-    try:
-        db = get_db()
+    db = get_db()
 
-        # Find user
+    try:
         found = await db.users.find_one({"email": user.email})
 
-        if not found or not verify_password(user.password, found["password_hash"]):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
+        if not found:
+            raise HTTPException(status_code=401, detail="User not found")
 
-        # Create token
+        if not verify_password(user.password, found["password_hash"]):
+            raise HTTPException(status_code=401, detail="Wrong password")
+
         token = create_access_token(str(found["_id"]))
 
         return {
@@ -102,6 +103,8 @@ async def login(user: UserLogin):
             "email": found["email"]
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        print("❌ Login Error:", str(e))
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        print("❌ LOGIN ERROR:", e)
+        raise HTTPException(status_code=500, detail=str(e))
