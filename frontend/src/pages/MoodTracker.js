@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -14,28 +13,43 @@ export default function MoodTracker() {
 
   const moods = ['😞','😕','😐','🙂','😊','😄','🤩'];
 
-  useEffect(() => { fetchLogs(); }, []);
+  useEffect(() => {
+    fetchLogs();
+  }, []);
 
   const fetchLogs = async () => {
     try {
-      const res = await axios.get(`${API}/mood/`, {
+      const res = await axios.get(`${API}/mood`, {
         headers: { Authorization: `Bearer ${token()}` }
       });
-      setLogs(res.data);
-    } catch (err) { console.error(err); }
+      setLogs(res.data || []);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/mood/`, { mood_score: mood, notes },
-        { headers: { Authorization: `Bearer ${token()}` } }
+      await axios.post(`${API}/mood`,
+        {
+          mood_score: Number(mood), // ✅ fix
+          notes: notes
+        },
+        {
+          headers: { Authorization: `Bearer ${token()}` }
+        }
       );
+
       setMessage('Mood logged successfully! ✅');
       setNotes('');
       fetchLogs();
+
       setTimeout(() => setMessage(''), 3000);
-    } catch (err) { setMessage('Failed to log mood ❌'); }
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to log mood ❌');
+    }
   };
 
   return (
@@ -44,22 +58,53 @@ export default function MoodTracker() {
         <Link to="/dashboard" style={styles.back}>← Back</Link>
         <h2 style={styles.title}>😊 Mood Tracker</h2>
       </div>
+
       <div style={styles.card}>
-        <h3 style={styles.label}>How are you feeling? {moods[Math.floor(mood/1.5)]}</h3>
-        <input type="range" min="1" max="10" value={mood}
-          onChange={e => setMood(e.target.value)} style={styles.slider} />
+        <h3 style={styles.label}>
+          How are you feeling? {moods[Math.floor(mood / 2)]}
+        </h3>
+
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={mood}
+          onChange={e => setMood(Number(e.target.value))} // ✅ fix
+          style={styles.slider}
+        />
+
         <p style={styles.moodScore}>Score: {mood}/10</p>
-        <textarea style={styles.textarea} placeholder="Add notes (optional)..."
-          value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
+
+        <textarea
+          style={styles.textarea}
+          placeholder="Add notes (optional)..."
+          value={notes}
+          onChange={e => setNotes(e.target.value)}
+          rows={3}
+        />
+
         {message && <p style={styles.message}>{message}</p>}
-        <button style={styles.button} onClick={handleSubmit}>Log Mood</button>
+
+        <button style={styles.button} onClick={handleSubmit}>
+          Log Mood
+        </button>
       </div>
+
       <h3 style={styles.historyTitle}>Recent Mood Logs</h3>
+
       {logs.slice(0, 7).map((log, i) => (
         <div key={i} style={styles.logItem}>
-          <span style={styles.logScore}>Score: {log.mood_score}/10</span>
-          <span style={styles.logDate}>{new Date(log.date).toLocaleDateString()}</span>
-          {log.notes && <p style={styles.logNotes}>{log.notes}</p>}
+          <span style={styles.logScore}>
+            Score: {log.mood_score}/10
+          </span>
+
+          <span style={styles.logDate}>
+            {log.date ? new Date(log.date).toLocaleDateString() : ''}
+          </span>
+
+          {log.notes && (
+            <p style={styles.logNotes}>{log.notes}</p>
+          )}
         </div>
       ))}
     </div>

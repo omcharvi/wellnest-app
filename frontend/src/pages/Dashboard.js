@@ -1,14 +1,38 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getDashboardData } from '../services/api'; 
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [data, setData] = useState(null); // API data
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(''); // Error state
 
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
+
+  // Fetch dashboard data on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login'); // redirect if no token
+      return;
+    }
+
+    getDashboardData(token)
+      .then((res) => {
+        setData(res); // Save API response
+        setError('');
+      })
+      .catch((err) => {
+        console.error(err);
+        setError('Failed to load dashboard data.');
+      })
+      .finally(() => setLoading(false));
+  }, [navigate]);
 
   const cards = [
     { title: '😊 Mood Tracker', desc: 'Log and track your daily mood', path: '/mood' },
@@ -18,13 +42,27 @@ export default function Dashboard() {
     { title: '📄 Reports', desc: 'Export your wellness reports', path: '/reports' },
   ];
 
+  if (loading) return <p style={{ color: '#fff' }}>Loading dashboard...</p>;
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
         <h1 style={styles.title}>🌿 WellNest</h1>
         <button style={styles.logout} onClick={handleLogout}>Logout</button>
       </div>
+
       <p style={styles.welcome}>Welcome back! How are you feeling today?</p>
+
+      {/* Example of showing some API data */}
+      {data && (
+        <div style={{ color: '#fff', marginBottom: '20px' }}>
+          <h3>Dashboard Stats:</h3>
+          <p>Moods Logged: {data.moodsCount || 0}</p>
+          <p>Journal Entries: {data.journalCount || 0}</p>
+        </div>
+      )}
+
       <div style={styles.grid}>
         {cards.map((card, i) => (
           <Link to={card.path} key={i} style={styles.card}>
@@ -37,6 +75,7 @@ export default function Dashboard() {
   );
 }
 
+// Styles remain the same
 const styles = {
   container: { minHeight: '100vh', background: '#0f1923', padding: '24px' },
   header: { display: 'flex', justifyContent: 'space-between',
