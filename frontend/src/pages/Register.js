@@ -2,33 +2,51 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
-const API = process.env.REACT_APP_API_URL;
+// ✅ Fallback added (VERY IMPORTANT)
+const API = process.env.REACT_APP_API_URL || "https://wellnest-app-rzup.onrender.com";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
+    setLoading(true);
+    setMessage("");
+
     try {
-      const _res= await axios.post(`${API}/auth/register`, {
+      console.log("API URL:", API); // 🔍 Debug
+
+      const res = await axios.post(`${API}/auth/register`, {
         name,
         email,
         password,
       });
 
+      console.log("Response:", res.data);
+
       setMessage("Registration successful ✅");
 
       // Redirect to login
       setTimeout(() => navigate("/"), 1500);
+
     } catch (err) {
-      console.error(err);
-      setMessage("Registration failed ❌");
+      console.error("Register Error:", err);
+
+      // ✅ Better error handling
+      if (err.response) {
+        setMessage(err.response.data.detail || "Registration failed ❌");
+      } else {
+        setMessage("Server not reachable ❌");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,8 +85,8 @@ export default function Register() {
 
           {message && <p style={{ color: "#fff" }}>{message}</p>}
 
-          <button style={styles.button} type="submit">
-            Register
+          <button style={styles.button} type="submit" disabled={loading}>
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
@@ -107,6 +125,7 @@ const styles = {
     background: "#4ecdc4",
     border: "none",
     borderRadius: "8px",
+    cursor: "pointer",
   },
   link: { color: "#8899aa", textAlign: "center", marginTop: "10px" },
 };
