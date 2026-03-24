@@ -1,16 +1,19 @@
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from backend.routes import auth, mood, journal, analytics, chat, reports
 
 load_dotenv()
 
-app = FastAPI()
+app = FastAPI(title="WellNest API", version="1.0.0")
 
-# ✅ CORS (OPEN TEMPORARY)
+# ✅ CORS - only add ONCE
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://wellnest-app-qbab.vercel.app",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,4 +28,4 @@ app.include_router(reports.router)
 
 @app.get("/")
 def root():
-    return {"status": "running"}
+    return {"status": "WellNest API running ✅"}
