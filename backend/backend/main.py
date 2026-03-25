@@ -7,23 +7,26 @@ load_dotenv()
 
 app = FastAPI()
 
-# ✅ CORS FIX (FINAL)
+# ✅ FINAL WORKING CORS
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://localhost:3002",
     "http://localhost:3003",
-    "http://localhost:3004"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,   # NOT "*"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ✅ DEBUG (must appear in logs)
+print("🔥 CORS ACTIVE")
+
+# Routes
 app.include_router(auth.router, prefix="/auth")
 app.include_router(mood.router, prefix="/mood")
 app.include_router(journal.router, prefix="/journal")
